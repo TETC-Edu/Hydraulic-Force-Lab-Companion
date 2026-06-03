@@ -1,0 +1,294 @@
+/* TETC slide system — 1280×720 canvas.
+   Imports colors_and_type.css for tokens. */
+@import url('./colors_and_type.css');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: #222;
+}
+
+/* Each <section> is a slide, 1280x720, anchored as flex children of
+   <deck-stage>. Inside, we position elements absolutely. */
+.slide {
+  font-family: var(--font-body);
+  color: var(--ink-body);
+  background: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+/* --- Slide chrome shared by every content slide ---------------------- */
+.chrome-header {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 72px;
+  background: var(--teal-500);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 48px;
+  z-index: 5;
+}
+.chrome-header .title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chrome-header .phase {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.22);
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: 16px;
+}
+.chrome-header .phase.engage   { background: rgba(255,255,255,0.22); }
+.chrome-header .phase.build    { background: var(--magenta-600); }
+.chrome-header .phase.evaluate { background: var(--teal-800); }
+
+.chrome-logo {
+  position: absolute;
+  left: 40px;
+  bottom: 22px;
+  width: 56px;
+  z-index: 5;
+}
+.chrome-number {
+  position: absolute;
+  right: 40px;
+  bottom: 22px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--gray-600);
+  z-index: 5;
+}
+
+/* --- Phase colors --- */
+.phase-engage   { background: var(--teal-500); }
+.phase-build    { background: var(--magenta-600); }
+.phase-evaluate { background: var(--teal-800); }
+
+/* --- Content area (below header) --- */
+.content {
+  position: absolute;
+  top: 72px;
+  left: 48px;
+  right: 48px;
+  bottom: 72px;
+  display: flex;
+  gap: 32px;
+}
+
+/* --- Callout boxes --- */
+.callout {
+  padding: 24px 28px;
+  color: white;
+}
+.callout .lbl {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 12px;
+  opacity: 0.92;
+}
+.callout p, .callout li {
+  font-size: 20px;
+  line-height: 1.4;
+  color: white;
+}
+.callout ul { padding-left: 22px; }
+.callout li + li { margin-top: 8px; }
+
+.callout-notice { background: var(--amber-550); }
+.callout-keyq   { background: var(--teal-500); }
+.callout-instr  { background: var(--magenta-600); }
+.callout-step1  { background: var(--blue-500); }
+.callout-step2  { background: var(--amber-550); }
+.callout-dark   { background: var(--teal-700); }
+
+/* --- Phase badge pill (used on sub-headers within a slide) --- */
+.phase-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  color: white;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+.phase-badge .dot { width: 6px; height: 6px; border-radius: 999px; background: rgba(255,255,255,0.9); }
+
+/* --- Numbered goal markers --- */
+.goal-num {
+  flex-shrink: 0;
+  width: 52px; height: 52px;
+  border-radius: 999px;
+  color: white;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 26px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* --- Generic body copy sizing inside slides (back-of-room) --- */
+.slide h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 1.1;
+  color: var(--ink);
+}
+.slide h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.slide p, .slide li {
+  font-size: 20px;
+  line-height: 1.4;
+  color: var(--ink-body);
+}
+.slide ul { padding-left: 24px; }
+.slide li + li { margin-top: 8px; }
+/* Callouts override the generic slide text color — specificity bump
+   so .slide p / .slide li don't win. */
+.slide .callout p,
+.slide .callout li { color: white; }
+.em-teal    { color: var(--teal-700); font-weight: 600; }
+.em-magenta { color: var(--magenta-600); font-weight: 600; }
+.em-amber   { color: var(--amber-550); font-weight: 600; }
+
+/* --- Title slide (full-bleed photo) ---------------------------------- */
+.slide.title-slide {
+  background: #000;
+}
+.slide.title-slide .bg {
+  position: absolute; inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.88);
+}
+.slide.title-slide .scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 55%, transparent 70%);
+}
+.slide.title-slide .brand-corner {
+  position: absolute;
+  top: 40px; right: 40px;
+  color: white;
+  font-family: var(--font-display);
+  text-align: right;
+}
+.slide.title-slide .brand-corner .fund {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.slide.title-slide .brand-corner .prog {
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+.slide.title-slide h1 {
+  position: absolute;
+  left: 80px;
+  bottom: 170px;
+  color: white;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 84px;
+  line-height: 0.98;
+  letter-spacing: -0.015em;
+  max-width: 760px;
+  margin: 0;
+}
+.slide.title-slide .subtitle {
+  position: absolute;
+  left: 80px;
+  bottom: 110px;
+  color: white;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 26px;
+  letter-spacing: 0.02em;
+  opacity: 0.95;
+  z-index: 3;
+}
+.slide.title-slide .arrow {
+  position: absolute;
+  bottom: 60px;
+  left: 80px;
+  right: 40px;
+  height: 3px;
+  background: white;
+}
+.slide.title-slide .arrow::after {
+  content: '';
+  position: absolute;
+  right: -2px; top: 50%;
+  transform: translateY(-50%);
+  border: 16px solid transparent;
+  border-left-color: white;
+  border-right: 0;
+}
+
+/* --- Divider slide (big solid fill) ---------------------------------- */
+.slide.divider-slide {
+  display: flex;
+  align-items: center;
+  padding: 0 120px;
+}
+.slide.divider-slide h1 {
+  color: white;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 96px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.slide.divider-slide .eyebrow {
+  color: rgba(255,255,255,0.78);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+.slide.divider-slide .swoosh {
+  position: absolute;
+  right: -80px; bottom: -80px;
+  width: 420px;
+  opacity: 0.16;
+}
+
+/* --- Photo panel (used on content slides) ---------------------------- */
+.photo-panel {
+  background-size: cover;
+  background-position: center;
+}

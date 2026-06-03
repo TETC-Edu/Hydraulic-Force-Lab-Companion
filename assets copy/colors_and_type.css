@@ -1,0 +1,266 @@
+/* ============================================================
+   TETC Design System — Colors + Type
+   Source of truth for all HTML artifacts in this project.
+   Derived from the EMF TE+TC 2026 PowerPoint template theme
+   + the Hydraulic Machines (JudoBot) 2026 reference deck.
+   ============================================================ */
+
+/* ---- Fonts ------------------------------------------------- */
+/* Brand: EMprint / EMprint Semibold (proprietary, not free).
+   Substitute: Barlow (Google Fonts) — closest humanist geometric
+   sans with matching weight range + x-height. FLAG: ask client
+   for licensed EMprint .ttf/.woff2 files for production use. */
+
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&display=swap');
+
+:root {
+  /* ---- Brand colors (theme.xml + reference deck) ----------- */
+
+  /* TEAL — primary brand color. Header bars, Key Question boxes,
+     ENGAGE phase, primary buttons. */
+  --teal-500:      #00ACA8;   /* theme accent3 — the one on every header */
+  --teal-600:      #00AAA6;   /* deck variant (near-identical) */
+  --teal-700:      #007096;   /* theme accent1 — dark teal for big fills */
+  --teal-800:      #146780;   /* deep teal from reference deck */
+  --teal-900:      #2D7492;   /* darkest teal variant */
+  --teal-050:      #E6F7F6;   /* tint, for subtle bg fills */
+
+  /* ORANGE / AMBER — Notice boxes, numbered-goal #2 circles,
+     warm accent for swooshes. */
+  --amber-500:     #ED8B00;   /* theme accent2 */
+  --amber-550:     #F18E21;   /* deck variant */
+  --amber-600:     #F7921E;   /* swoosh variant */
+  --amber-400:     #FFAC3E;   /* lighter amber from deck */
+  --amber-050:     #FFF4E0;   /* tint */
+
+  /* MAGENTA / PINK — BUILD phase badge, Instructions callout,
+     Testing Area box, goal #3 circles. */
+  --magenta-500:   #BD2F7F;   /* theme accent4 */
+  --magenta-600:   #B01E78;   /* deck variant (darker) */
+  --magenta-700:   #AE2078;   /* swoosh variant */
+  --magenta-650:   #AF2078;   /* alt deck variant */
+  --magenta-050:   #FAE6F1;   /* tint */
+
+  /* BLUE — Step 1 / Partner Testing callouts in reference deck. */
+  --blue-500:      #3C87E3;
+  --blue-600:      #2B6FC7;
+
+  /* NEUTRAL grays — body text, dividers, muted labels. */
+  --gray-900:      #000000;   /* theme dk1 */
+  --gray-700:      #5A5A5A;   /* theme lt2 — body text */
+  --gray-600:      #595959;   /* theme accent5 — near duplicate */
+  --gray-500:      #54565A;   /* logo monogram letters */
+  --gray-300:      #C8C8C8;
+  --gray-200:      #E4E4E4;
+  --gray-100:      #F2F2F2;
+  --gray-050:      #F8F8F8;   /* subtlest gray, for alternating row fills */
+  --white:         #FFFFFF;
+
+  /* ---- Semantic aliases (what the design consumes) --------- */
+
+  /* Surface / ink */
+  --bg:            var(--white);
+  --bg-muted:      var(--gray-100);
+  --bg-dark:       var(--teal-700);         /* dark teal section fills */
+  --ink:           var(--gray-900);
+  --ink-body:      var(--gray-700);         /* default body text color */
+  --ink-muted:     var(--gray-600);
+  --ink-inverse:   var(--white);
+
+  /* Brand semantic */
+  --brand:         var(--teal-500);         /* the primary teal */
+  --brand-dark:    var(--teal-700);
+  --accent-warm:   var(--amber-550);
+  --accent-bold:   var(--magenta-600);
+
+  /* Phase colors (ENGAGE / BUILD / EVALUATE) — these drive
+     the phase-badge pill, accent borders, and the top-right
+     phase indicator on every content slide. */
+  --phase-engage:     var(--teal-500);
+  --phase-build:      var(--magenta-600);
+  --phase-evaluate:   var(--teal-800);      /* reference deck uses deep teal,
+                                                NOT purple, for EVALUATE */
+
+  /* Callout box colors (used all over slides + student sheets) */
+  --callout-notice-bg:       var(--amber-550);      /* "Notice" prompts  */
+  --callout-notice-ink:      var(--white);
+  --callout-keyq-bg:         var(--teal-500);       /* "Key Question" prompts */
+  --callout-keyq-ink:        var(--white);
+  --callout-instr-bg:        var(--magenta-600);    /* "Instructions" block */
+  --callout-instr-ink:       var(--white);
+  --callout-constraint-bg:   var(--teal-500);       /* "Constraints" block */
+  --callout-constraint-ink:  var(--white);
+  --callout-step1-bg:        var(--blue-500);       /* "Step 1" header */
+  --callout-step2-bg:        var(--amber-550);      /* "Step 2" header */
+
+  /* Focus / link */
+  --link:          var(--teal-700);
+  --focus-ring:    0 0 0 3px rgba(0,172,168,0.45);
+
+  /* ---- Type — font stacks --------------------------------- */
+  --font-display:  'Barlow', 'EMprint Semibold', 'EMprint', 'Helvetica Neue', Arial, sans-serif;
+  --font-body:     'Barlow', 'EMprint', 'Calibri', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono:     'SF Mono', Menlo, Consolas, monospace;
+
+  /* ---- Type scale — sized for BACK-OF-CLASSROOM readability.
+     Slides (1280×720): body never smaller than 22px; titles 44-80px.
+     Student sheets (print): body 11-12pt. Card tokens below are
+     for the DESIGN SYSTEM reference — slide components define their
+     own inline sizes tuned to the 1280×720 canvas. */
+  --text-xs:       12px;
+  --text-sm:       14px;
+  --text-base:     16px;
+  --text-md:       18px;
+  --text-lg:       22px;
+  --text-xl:       28px;
+  --text-2xl:      36px;
+  --text-3xl:      44px;
+  --text-4xl:      56px;
+  --text-5xl:      72px;
+  --text-6xl:      96px;
+
+  /* Line heights */
+  --lh-tight:      1.05;
+  --lh-snug:       1.2;
+  --lh-normal:     1.35;
+  --lh-relaxed:    1.5;
+
+  /* Letter spacing — ALL-CAPS phase badges want tracking */
+  --tracking-wide:    0.08em;
+  --tracking-wider:   0.12em;
+  --tracking-widest:  0.18em;
+
+  /* Weights */
+  --weight-regular:   400;
+  --weight-medium:    500;
+  --weight-semibold:  600;
+  --weight-bold:      700;
+  --weight-black:     800;
+
+  /* ---- Spacing (8-pt grid) -------------------------------- */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-7:  32px;
+  --space-8:  40px;
+  --space-9:  56px;
+  --space-10: 80px;
+
+  /* ---- Radii — template is mostly SQUARE with rare 6-12px rounding */
+  --radius-none:   0;
+  --radius-sm:     4px;
+  --radius-md:     8px;
+  --radius-lg:     12px;
+  --radius-pill:   999px;
+
+  /* ---- Borders -------------------------------------------- */
+  --border-thin:       1px solid var(--gray-200);
+  --border-med:        2px solid var(--gray-900);
+  --border-heavy:      4px solid var(--gray-900);
+  --border-accent:     4px solid var(--brand);
+
+  /* ---- Shadows — template uses almost none. Keep subtle. -- */
+  --shadow-sm:   0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md:   0 2px 8px rgba(0,0,0,0.08);
+  --shadow-lg:   0 6px 24px rgba(0,0,0,0.12);
+
+  /* ---- Slide canvas --------------------------------------- */
+  --slide-w:          1280px;
+  --slide-h:          720px;
+  --slide-margin:     64px;
+  --slide-header-h:   72px;   /* the teal bar across top of content slides */
+}
+
+/* ============================================================
+   Semantic element styles — use these directly, or mirror them.
+   ============================================================ */
+
+body.tetc {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--lh-normal);
+  color: var(--ink-body);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Display titles — full-bleed title slides, section dividers */
+.tetc-display {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-5xl);
+  line-height: var(--lh-tight);
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+/* H1 — the white title text inside the teal header bar of content slides */
+.tetc-h1 {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-3xl);
+  line-height: var(--lh-tight);
+  color: var(--ink);
+  letter-spacing: -0.005em;
+}
+
+/* H2 — section heading inside a slide */
+.tetc-h2 {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-2xl);
+  line-height: var(--lh-snug);
+  color: var(--ink);
+}
+
+/* H3 — column heading, card title */
+.tetc-h3 {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-xl);
+  line-height: var(--lh-snug);
+  color: var(--ink);
+}
+
+/* Body — the default readable paragraph */
+.tetc-body {
+  font-family: var(--font-body);
+  font-weight: var(--weight-regular);
+  font-size: var(--text-lg);
+  line-height: var(--lh-normal);
+  color: var(--ink-body);
+}
+
+.tetc-body-sm {
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  line-height: var(--lh-normal);
+  color: var(--ink-body);
+}
+
+/* Eyebrow / phase badge label — ENGAGE, BUILD, EVALUATE */
+.tetc-eyebrow {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+  line-height: 1;
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+}
+
+/* Label — small caption, slide number, byline */
+.tetc-label {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+/* Strong inline emphasis — magenta or teal, used a lot in the deck */
+.tetc-em-teal    { color: var(--teal-700); font-weight: var(--weight-semibold); }
+.tetc-em-magenta { color: var(--magenta-600); font-weight: var(--weight-semibold); }
+.tetc-em-amber   { color: var(--amber-550); font-weight: var(--weight-semibold); }

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "static",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["/Users/taylor/Desktop/Coding/Hydraulic Student Companion/serve.js"],
+      "port": 5173
+    }
+  ]
+}
