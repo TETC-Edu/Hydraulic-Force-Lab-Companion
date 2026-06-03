@@ -734,7 +734,7 @@
     number.addEventListener('blur', function () { var v = clampDia(parseFloat(number.value)); if (v === null) { number.value = round1(ex[role]); return; } exSetDia(role, v, 'blur'); });
   }
 
-  function exRender() { exReadouts(); exAreaCircles(); exAnimNote(); exReality(); updateAnim(); }
+  function exRender() { exReadouts(); exAreaCircles(); exAnimNote(); exReality(); buildAnim(); }
 
   // Rehearse the Measure gap right inside the sim. Uses a typical 80% efficiency
   // (matches the unit's 4.0x -> 3.2x example); labeled "typical", not exact.
@@ -823,19 +823,32 @@
   var MAX_TRAVEL = 120;
   var animP = 0, animRAF = null, anim = null;
 
-  // Fixed geometry.
-  var G = {
-    inBarrelX: 60, inBarrelY: 250, inBarrelW: 180, inBarrelH: 46,
-    sealX0: 72,                              // input seal left edge at rest
-    outX: 430, outW: 70, outTop: 150, outBottom: 370,
-    baseFluid: 30, sealH: 12, loadH: 32, loadW: 64
+  // Fixed layout constants (positions that do not depend on diameter).
+  var LAY = {
+    inBarrelX: 70, inBarrelW: 175, inCy: 250, sealX0: 80,
+    outCx: 476, outTop: 112, outBottom: 358,
+    baseFluid: 28, sealH: 12, loadH: 30, maxDiaPx: 74
   };
-  G.inInteriorRight = G.inBarrelX + G.inBarrelW; // 240
-  G.inCy = G.inBarrelY + G.inBarrelH / 2;        // 273
-  G.outBottomInt = G.outBottom - 4;              // 366
-  G.outCx = G.outX + G.outW / 2;
-  G.sealTopRest = G.outBottomInt - G.baseFluid - G.sealH; // seal top at rest (low)
-  G.loadTopRest = G.sealTopRest - G.loadH;       // load rests directly on the seal
+  LAY.inInteriorRight = LAY.inBarrelX + LAY.inBarrelW;
+  LAY.outBottomInt = LAY.outBottom - 4;
+
+  // Barrel cross-sections are drawn at the TRUE diameter ratio: the larger of the
+  // two diameters maps to maxDiaPx, the other scales by the same factor. So a wide
+  // output really looks wider than a narrow input.
+  function geom() {
+    var di = ex.in, dout = ex.out;
+    var sdia = LAY.maxDiaPx / Math.max(di, dout, 1);
+    var g = { di: di, dout: dout };
+    g.inH = Math.max(15, di * sdia);
+    g.outW = Math.max(15, dout * sdia);
+    g.inCy = LAY.inCy;
+    g.inBarrelY = g.inCy - g.inH / 2;
+    g.outX = LAY.outCx - g.outW / 2;
+    g.sealTopRest = LAY.outBottomInt - LAY.baseFluid - LAY.sealH;
+    g.loadW = Math.max(46, g.outW + 14);
+    g.loadTopRest = g.sealTopRest - LAY.loadH;
+    return g;
+  }
 
   function travels() {
     var m = exMult();
@@ -849,36 +862,45 @@
     if (!svg) return;
     svg.innerHTML = '';
     var a = {};
+    var L = LAY, g = geom();
+    // stash the geometry updateAnim needs
+    a.inH = g.inH; a.outW = g.outW; a.outX = g.outX;
+    a.sealTopRest = g.sealTopRest; a.loadTopRest = g.loadTopRest; a.loadW = g.loadW;
+
+    var inCy = L.inCy, inBarrelY = g.inBarrelY, inH = g.inH;
+    var outX = g.outX, outW = g.outW, outCx = L.outCx;
+    var sealTopRest = g.sealTopRest, loadTopRest = g.loadTopRest, loadW = g.loadW;
 
     // connecting tube (behind everything)
     svg.appendChild(el('path', {
-      d: 'M' + (G.inInteriorRight + 8) + ' ' + G.inCy + ' L350 ' + G.inCy + ' L350 ' + (G.outBottom + 2) + ' L' + G.outCx + ' ' + (G.outBottom + 2),
-      stroke: '#186172', 'stroke-width': 12, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: 0.45
+      d: 'M' + (L.inInteriorRight + 6) + ' ' + inCy + ' L355 ' + inCy + ' L355 ' + (L.outBottom + 2) + ' L' + outCx + ' ' + (L.outBottom + 2),
+      stroke: '#186172', 'stroke-width': 12, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: 0.4
     }));
 
-    // ===== INPUT =====
-    svg.appendChild(el('rect', { x: G.inBarrelX, y: G.inBarrelY, width: G.inBarrelW, height: G.inBarrelH, rx: 6, fill: '#fff', stroke: '#186172', 'stroke-width': 2 }));
-    a.inFluid = el('rect', { y: G.inBarrelY + 3, height: G.inBarrelH - 6, rx: 3, fill: 'rgba(13,180,174,0.30)' });
+    // ===== INPUT (horizontal, barrel thickness = input diameter) =====
+    svg.appendChild(el('rect', { x: L.inBarrelX, y: inBarrelY, width: L.inBarrelW, height: inH, rx: 6, fill: '#fff', stroke: '#186172', 'stroke-width': 2 }));
+    a.inFluid = el('rect', { y: inBarrelY + 3, height: inH - 6, rx: 3, fill: 'rgba(13,180,174,0.30)' });
     svg.appendChild(a.inFluid);
-    svg.appendChild(el('path', { d: 'M' + G.inInteriorRight + ' ' + (G.inCy - 9) + ' L' + (G.inInteriorRight + 12) + ' ' + G.inCy + ' L' + G.inInteriorRight + ' ' + (G.inCy + 9) + ' Z', fill: '#186172' }));
+    svg.appendChild(el('path', { d: 'M' + L.inInteriorRight + ' ' + (inCy - 8) + ' L' + (L.inInteriorRight + 11) + ' ' + inCy + ' L' + L.inInteriorRight + ' ' + (inCy + 8) + ' Z', fill: '#186172' }));
+    txt(svg, L.inInteriorRight - 4, inBarrelY - 7, 'Ø ' + round1(g.di) + ' mm', { 'text-anchor': 'end', fill: '#8a8a8a', 'font-family': "'DM Sans',sans-serif", 'font-size': 11 });
 
     // plunger group (seal + rod + thumb + push hint) translates on X
+    var sealH2 = inH + 8, thumbH = Math.max(34, inH + 8);
     a.inGroup = el('g', {});
-    a.inGroup.appendChild(el('rect', { x: G.sealX0, y: G.inBarrelY - 4, width: 10, height: G.inBarrelH + 8, rx: 3, fill: '#186172' }));
-    a.inGroup.appendChild(el('rect', { x: G.sealX0 - 44, y: G.inCy - 5, width: 44, height: 10, rx: 3, fill: '#186172' }));
-    a.inGroup.appendChild(el('rect', { x: G.sealX0 - 58, y: G.inCy - 22, width: 16, height: 44, rx: 4, fill: '#186172' }));
-    // grip lines on the thumb
-    a.inGroup.appendChild(el('line', { x1: G.sealX0 - 54, y1: G.inCy - 8, x2: G.sealX0 - 46, y2: G.inCy - 8, stroke: '#fff', 'stroke-width': 2, opacity: 0.7 }));
-    a.inGroup.appendChild(el('line', { x1: G.sealX0 - 54, y1: G.inCy, x2: G.sealX0 - 46, y2: G.inCy, stroke: '#fff', 'stroke-width': 2, opacity: 0.7 }));
-    a.inGroup.appendChild(el('line', { x1: G.sealX0 - 54, y1: G.inCy + 8, x2: G.sealX0 - 46, y2: G.inCy + 8, stroke: '#fff', 'stroke-width': 2, opacity: 0.7 }));
-    // push hint above the thumb (stays on-screen, moves with the handle)
-    a.inGroup.appendChild(el('path', { d: 'M' + (G.sealX0 - 50) + ' ' + (G.inBarrelY - 16) + ' l 22 0 m -7 -5 l 7 5 l -7 5', stroke: '#BD2F7F', 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
-    txt(a.inGroup, G.sealX0 - 18, G.inBarrelY - 22, '1× push', { 'text-anchor': 'start', fill: '#BD2F7F', 'font-family': "'Outfit',sans-serif", 'font-weight': 700, 'font-size': 13 });
+    a.inGroup.appendChild(el('rect', { x: L.sealX0, y: inCy - sealH2 / 2, width: 10, height: sealH2, rx: 3, fill: '#186172' }));
+    a.inGroup.appendChild(el('rect', { x: L.sealX0 - 44, y: inCy - 5, width: 44, height: 10, rx: 3, fill: '#186172' }));
+    a.inGroup.appendChild(el('rect', { x: L.sealX0 - 58, y: inCy - thumbH / 2, width: 16, height: thumbH, rx: 4, fill: '#186172' }));
+    a.inGroup.appendChild(el('line', { x1: L.sealX0 - 54, y1: inCy - 7, x2: L.sealX0 - 46, y2: inCy - 7, stroke: '#fff', 'stroke-width': 2, opacity: 0.7 }));
+    a.inGroup.appendChild(el('line', { x1: L.sealX0 - 54, y1: inCy, x2: L.sealX0 - 46, y2: inCy, stroke: '#fff', 'stroke-width': 2, opacity: 0.7 }));
+    a.inGroup.appendChild(el('line', { x1: L.sealX0 - 54, y1: inCy + 7, x2: L.sealX0 - 46, y2: inCy + 7, stroke: '#fff', 'stroke-width': 2, opacity: 0.7 }));
+    var hintY = inCy - thumbH / 2 - 10;
+    a.inGroup.appendChild(el('path', { d: 'M' + (L.sealX0 - 50) + ' ' + hintY + ' l 22 0 m -7 -5 l 7 5 l -7 5', stroke: '#BD2F7F', 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
+    txt(a.inGroup, L.sealX0 - 18, hintY - 6, '1× push', { 'text-anchor': 'start', fill: '#BD2F7F', 'font-family': "'Outfit',sans-serif", 'font-weight': 700, 'font-size': 13 });
     svg.appendChild(a.inGroup);
 
-    // ---- input distance ruler (horizontal, below the barrel) ----
-    a.inRX0 = G.sealX0;
-    a.inRulerY = G.inBarrelY + G.inBarrelH + 16; // 312
+    // ---- input distance ruler (horizontal) ----
+    a.inRX0 = L.sealX0;
+    a.inRulerY = 320;
     svg.appendChild(el('line', { x1: a.inRX0, y1: a.inRulerY, x2: a.inRX0 + MAX_TRAVEL, y2: a.inRulerY, stroke: '#cdbfae', 'stroke-width': 2 }));
     for (var i = 0; i <= 5; i++) {
       var tx = a.inRX0 + i * 24;
@@ -888,27 +910,27 @@
     a.inDim = el('line', { x1: a.inRX0, y1: a.inRulerY, x2: a.inRX0, y2: a.inRulerY, stroke: '#186172', 'stroke-width': 5, 'stroke-linecap': 'round' });
     svg.appendChild(a.inDim);
     a.inDimLabel = txt(svg, a.inRX0, a.inRulerY - 9, '', { 'text-anchor': 'middle', fill: '#186172', 'font-family': "'Outfit',sans-serif", 'font-weight': 700, 'font-size': 12 });
-    txt(svg, G.inBarrelX + G.inBarrelW / 2, a.inRulerY + 38, 'Input travel (units)', { 'text-anchor': 'middle', fill: '#5a5a5a', 'font-family': "'Outfit',sans-serif", 'font-weight': 600, 'font-size': 13 });
+    txt(svg, L.inBarrelX + L.inBarrelW / 2, a.inRulerY + 38, 'Input travel (units)', { 'text-anchor': 'middle', fill: '#5a5a5a', 'font-family': "'Outfit',sans-serif", 'font-weight': 600, 'font-size': 13 });
 
-    // ===== OUTPUT =====
-    a.outFluid = el('rect', { x: G.outX + 3, width: G.outW - 6, rx: 3, fill: 'rgba(13,180,174,0.30)' });
+    // ===== OUTPUT (vertical, barrel thickness = output diameter) =====
+    a.outFluid = el('rect', { x: outX + 3, width: outW - 6, rx: 3, fill: 'rgba(13,180,174,0.30)' });
     svg.appendChild(a.outFluid);
-    // barrel outline on top of fluid so edges read cleanly
-    svg.appendChild(el('rect', { x: G.outX, y: G.outTop, width: G.outW, height: G.outBottom - G.outTop, rx: 6, fill: 'none', stroke: '#0DB4AE', 'stroke-width': 2 }));
+    svg.appendChild(el('rect', { x: outX, y: L.outTop, width: outW, height: L.outBottom - L.outTop, rx: 6, fill: 'none', stroke: '#0DB4AE', 'stroke-width': 2 }));
+    txt(svg, outCx, L.outTop - 8, 'Ø ' + round1(g.dout) + ' mm', { 'text-anchor': 'middle', fill: '#8a8a8a', 'font-family': "'DM Sans',sans-serif", 'font-size': 11 });
 
     // lift group (seal + load + up-arrow) translates on Y
     a.outGroup = el('g', {});
-    a.outGroup.appendChild(el('rect', { x: G.outX, y: G.sealTopRest, width: G.outW, height: G.sealH, rx: 2, fill: '#0a857f' }));
-    a.outGroup.appendChild(el('rect', { x: G.outCx - G.loadW / 2, y: G.loadTopRest, width: G.loadW, height: G.loadH, rx: 4, fill: '#E8943A' }));
-    txt(a.outGroup, G.outCx, G.loadTopRest + G.loadH / 2 + 5, 'load', { 'text-anchor': 'middle', fill: '#fff', 'font-family': "'Outfit',sans-serif", 'font-weight': 700, 'font-size': 14 });
+    a.outGroup.appendChild(el('rect', { x: outX, y: sealTopRest, width: outW, height: L.sealH, rx: 2, fill: '#0a857f' }));
+    a.outGroup.appendChild(el('rect', { x: outCx - loadW / 2, y: loadTopRest, width: loadW, height: L.loadH, rx: 4, fill: '#E8943A' }));
+    txt(a.outGroup, outCx, loadTopRest + L.loadH / 2 + 5, 'load', { 'text-anchor': 'middle', fill: '#fff', 'font-family': "'Outfit',sans-serif", 'font-weight': 700, 'font-size': 13 });
     a.outArrow = el('path', { stroke: '#BD2F7F', 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' });
     a.outGroup.appendChild(a.outArrow);
     a.outLabel = txt(a.outGroup, 0, 0, '', { 'text-anchor': 'middle', fill: '#BD2F7F', 'font-family': "'Outfit',sans-serif", 'font-weight': 700, 'font-size': 13 });
     svg.appendChild(a.outGroup);
 
-    // ---- output distance ruler (vertical, left of the barrel, SAME tick size) ----
-    a.outRX = G.outX - 18;
-    a.outR0 = G.sealTopRest; // y at 0 units (rest)
+    // ---- output distance ruler (vertical, SAME tick size as input) ----
+    a.outRX = outX - 16;
+    a.outR0 = sealTopRest;
     svg.appendChild(el('line', { x1: a.outRX, y1: a.outR0, x2: a.outRX, y2: a.outR0 - MAX_TRAVEL, stroke: '#9ccfcb', 'stroke-width': 2 }));
     for (var j = 0; j <= 5; j++) {
       var ty = a.outR0 - j * 24;
@@ -918,14 +940,14 @@
     a.outDim = el('line', { x1: a.outRX, y1: a.outR0, x2: a.outRX, y2: a.outR0, stroke: '#0a857f', 'stroke-width': 5, 'stroke-linecap': 'round' });
     svg.appendChild(a.outDim);
     a.outDimLabel = txt(svg, a.outRX - 9, a.outR0, '', { 'text-anchor': 'end', fill: '#0a857f', 'font-family': "'Outfit',sans-serif", 'font-weight': 700, 'font-size': 12 });
-    txt(svg, G.outCx, G.outBottom + 22, 'Output lift (units)', { 'text-anchor': 'middle', fill: '#5a5a5a', 'font-family': "'Outfit',sans-serif", 'font-weight': 600, 'font-size': 13 });
+    txt(svg, outCx, L.outBottom + 22, 'Output lift (units)', { 'text-anchor': 'middle', fill: '#5a5a5a', 'font-family': "'Outfit',sans-serif", 'font-weight': 600, 'font-size': 13 });
 
     // focus ring (hidden until the handle is focused)
-    a.ring = el('rect', { x: 5, y: G.inBarrelY - 31, width: 250, height: G.inBarrelH + 62, rx: 8, fill: 'none', stroke: '#0DB4AE', 'stroke-width': 3, 'stroke-dasharray': '5 4', visibility: 'hidden' });
+    a.ring = el('rect', { x: 5, y: inCy - 60, width: 252, height: 120, rx: 8, fill: 'none', stroke: '#0DB4AE', 'stroke-width': 3, 'stroke-dasharray': '5 4', visibility: 'hidden' });
     svg.appendChild(a.ring);
 
     // drag / keyboard hit target (persistent)
-    a.hit = el('rect', { id: 'anim-hit', x: 4, y: G.inBarrelY - 32, width: 252, height: G.inBarrelH + 64, fill: 'transparent', tabindex: '0', role: 'slider', 'aria-label': 'Input plunger. Drag or use arrow keys to push.', 'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-valuenow': '0' });
+    a.hit = el('rect', { id: 'anim-hit', x: 4, y: inCy - 62, width: 255, height: 124, fill: 'transparent', tabindex: '0', role: 'slider', 'aria-label': 'Input plunger. Drag or use arrow keys to push.', 'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-valuenow': '0' });
     svg.appendChild(a.hit);
 
     anim = a;
@@ -937,23 +959,24 @@
     if (!anim) return;
     var t = travels(), p = animP, m = t.m;
     var px = p * t.inPx, py = p * t.outPx;
+    var L = LAY;
 
     // input
     anim.inGroup.setAttribute('transform', 'translate(' + px + ',0)');
-    var fx = G.sealX0 + 10 + px;
+    var fx = L.sealX0 + 10 + px;
     anim.inFluid.setAttribute('x', fx);
-    anim.inFluid.setAttribute('width', Math.max(0, G.inInteriorRight - fx - 1));
+    anim.inFluid.setAttribute('width', Math.max(0, L.inInteriorRight - fx - 1));
 
     // output
     anim.outGroup.setAttribute('transform', 'translate(0,' + (-py) + ')');
-    var fluidTop = G.sealTopRest + G.sealH - py;
+    var fluidTop = anim.sealTopRest + L.sealH - py;
     anim.outFluid.setAttribute('y', fluidTop);
-    anim.outFluid.setAttribute('height', Math.max(0, G.outBottomInt - fluidTop));
+    anim.outFluid.setAttribute('height', Math.max(0, L.outBottomInt - fluidTop));
 
     // output force arrow (length scales gently with force; lives in the lift group)
     var arrowLen = m ? Math.max(18, Math.min(108, 15 * m)) : 22;
-    var ax = G.outX + G.outW + 26;
-    var ayBase = G.loadTopRest + G.loadH / 2;
+    var ax = anim.outX + anim.outW + 26;
+    var ayBase = anim.loadTopRest + L.loadH / 2;
     anim.outArrow.setAttribute('d', 'M' + ax + ' ' + ayBase + ' l 0 ' + (-arrowLen) + ' m -6 8 l 6 -8 l 6 8');
     anim.outLabel.setAttribute('x', ax);
     anim.outLabel.setAttribute('y', ayBase - arrowLen - 8);
