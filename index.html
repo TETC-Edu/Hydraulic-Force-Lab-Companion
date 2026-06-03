@@ -1260,40 +1260,10 @@
     },
     {
       type: 'numeric',
-      prompt: 'An input is <span class="em">10 mm</span> across, the output is <span class="em">30 mm</span>. What is the force multiplier?',
-      suffix: '×', answer: 9, tol: 0.05,
-      nudge: '30 ÷ 10 = 3. The multiplier is that ratio squared, not the ratio itself.',
-      right: 'Yes. 30 ÷ 10 = 3, and 3 squared is <b>9×</b>. Three times as wide, nine times the force.'
-    },
-    {
-      type: 'choice',
-      prompt: 'You need to lift <span class="em">4× harder</span>. Which syringe pair does it?',
-      options: [
-        { label: 'Input 10 mm → output 15 mm' },
-        { label: 'Input 10 mm → output 20 mm', correct: true },
-        { label: 'Input 20 mm → output 20 mm' },
-        { label: 'Input 20 mm → output 30 mm' }
-      ],
-      nudge: 'You want the diameter ratio to square to 4. So the ratio itself needs to be 2. Which pair is exactly twice as wide?',
-      right: 'Exactly. 20 ÷ 10 = 2, squared is <b>4×</b>. The output is twice the input diameter.'
-    },
-    {
-      type: 'numeric',
-      prompt: 'The output piston has <span class="em">4 times</span> the face area of the input. How many times <span class="em">wider</span> is its diameter?',
-      suffix: '× wider', answer: 2, tol: 0.05,
-      nudge: 'Area is the diameter ratio squared, so run it backwards. What number, squared, gives 4?',
-      right: 'Right. Work backwards from the square: the square root of 4 is <b>2</b>. The diameter is twice as wide.'
-    },
-    {
-      type: 'choice',
-      prompt: 'The rescue arm must lift a <span class="em">heavy beam</span> a short distance. Which setup?',
-      options: [
-        { label: 'Small input → big output', correct: true },
-        { label: 'Big input → small output' },
-        { label: 'Equal sizes, 1 : 1' }
-      ],
-      nudge: 'Heavy means you need force, and you do not need much travel. Which output is wider than the input?',
-      right: 'Yes. A small input into a big output trades travel for <b>force</b>. Wider output, stronger lift. This is the rescue arm.'
+      prompt: 'A pair gives a <span class="em">4× force multiplier</span>. You push the input <span class="em">8 cm</span>. How far does the output move?',
+      suffix: 'cm', answer: 2, tol: 0.05,
+      nudge: 'Force up means distance down by the same factor. You gained 4× force, so you lose 4× distance. 8 ÷ 4 = ?',
+      right: 'Right. What you gain in force you pay back in distance. 8 ÷ 4 = <b>2 cm</b>.'
     },
     {
       type: 'choice',
@@ -1305,20 +1275,6 @@
       ],
       nudge: 'Force and distance trade off. To win distance and speed, you spend force. Which output moves farther than the input?',
       right: 'Yes. A big input into a small output gives you <b>more travel and speed</b>, at the cost of force. That is the far-and-fast end of the budget.'
-    },
-    {
-      type: 'numeric',
-      prompt: 'A pair gives a <span class="em">4× force multiplier</span>. You push the input <span class="em">8 cm</span>. How far does the output move?',
-      suffix: 'cm', answer: 2, tol: 0.05,
-      nudge: 'Force up means distance down by the same factor. You gained 4× force, so you lose 4× distance. 8 ÷ 4 = ?',
-      right: 'Right. What you gain in force you pay back in distance. 8 ÷ 4 = <b>2 cm</b>.'
-    },
-    {
-      type: 'numeric',
-      prompt: 'The equation predicts <span class="em">4.0×</span>. At the bench you measured <span class="em">3.2×</span>. How big is the gap?',
-      suffix: '×', answer: 0.8, tol: 0.05,
-      nudge: 'The gap is just what the equation promised minus what you actually got. 4.0 − 3.2 = ?',
-      right: 'Right. 4.0 − 3.2 = <b>0.8×</b>. That missing force is friction, seal drag, and air in the line. Engineering lives in that gap.'
     },
     {
       type: 'choice',
