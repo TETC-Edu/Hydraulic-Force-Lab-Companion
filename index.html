@@ -1242,10 +1242,10 @@
   var CHALLENGES = [
     {
       type: 'numeric',
-      prompt: 'An input syringe is <span class="em">16 mm</span> across. The output is <span class="em">32 mm</span>. What is the force multiplier?',
-      suffix: '×', answer: 4, tol: 0.05,
-      nudge: 'Close reading: the multiplier is the diameter ratio, squared. 32 ÷ 16 = 2. Now square the 2.',
-      right: 'Yes. 32 ÷ 16 = 2, and 2 squared is <b>4×</b>. Twice as wide pushes four times as hard.'
+      prompt: 'An input syringe is <span class="em">12 mm</span> across. The output is <span class="em">36 mm</span>. What is the force multiplier?',
+      suffix: '×', answer: 9, tol: 0.05,
+      nudge: 'The multiplier is the diameter ratio, squared. 36 ÷ 12 = 3. Now square the 3.',
+      right: 'Yes. 36 ÷ 12 = 3, and 3 squared is <b>9×</b>. Three times as wide pushes nine times as hard.'
     },
     {
       type: 'choice',
@@ -1260,10 +1260,10 @@
     },
     {
       type: 'numeric',
-      prompt: 'A pair gives a <span class="em">4× force multiplier</span>. You push the input <span class="em">8 cm</span>. How far does the output move?',
-      suffix: 'cm', answer: 2, tol: 0.05,
-      nudge: 'Force up means distance down by the same factor. You gained 4× force, so you lose 4× distance. 8 ÷ 4 = ?',
-      right: 'Right. What you gain in force you pay back in distance. 8 ÷ 4 = <b>2 cm</b>.'
+      prompt: 'A pair gives a <span class="em">6× force multiplier</span>. You push the input <span class="em">30 cm</span>. How far does the output move?',
+      suffix: 'cm', answer: 5, tol: 0.05,
+      nudge: 'Force up means distance down by the same factor. You gained 6× force, so you lose 6× distance. 30 ÷ 6 = ?',
+      right: 'Right. What you gain in force you pay back in distance. 30 ÷ 6 = <b>5 cm</b>.'
     },
     {
       type: 'choice',
