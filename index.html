@@ -722,6 +722,7 @@
     if (source !== 'number') number.value = round1(v);
     picker.querySelectorAll('.preset').forEach(function (p) { p.setAttribute('aria-pressed', String(Math.abs(parseFloat(p.dataset.d) - v) < 0.05)); });
     lsSet('hfl:lastPair', { in: ex.in, out: ex.out });
+    animP = 0; // a new pair starts at rest, so the plunger never looks stuck mid-push
     exRender();
   }
 
@@ -929,7 +930,9 @@
     svg.appendChild(a.outGroup);
 
     // ---- output distance ruler (vertical, SAME tick size as input) ----
-    a.outRX = outX - 16;
+    // Ruler numbers sit to the LEFT of the line; the live value rides to the RIGHT
+    // of the line so the two never collide.
+    a.outRX = outX - 26;
     a.outR0 = sealTopRest;
     svg.appendChild(el('line', { x1: a.outRX, y1: a.outR0, x2: a.outRX, y2: a.outR0 - MAX_TRAVEL, stroke: '#9ccfcb', 'stroke-width': 2 }));
     for (var j = 0; j <= 5; j++) {
@@ -939,7 +942,7 @@
     }
     a.outDim = el('line', { x1: a.outRX, y1: a.outR0, x2: a.outRX, y2: a.outR0, stroke: '#0a857f', 'stroke-width': 5, 'stroke-linecap': 'round' });
     svg.appendChild(a.outDim);
-    a.outDimLabel = txt(svg, a.outRX - 9, a.outR0, '', { 'text-anchor': 'end', fill: '#0a857f', 'font-family': "'Outfit',sans-serif", 'font-weight': 700, 'font-size': 12 });
+    a.outDimLabel = txt(svg, a.outRX + 8, a.outR0, '', { 'text-anchor': 'start', fill: '#0a857f', 'font-family': "'Outfit',sans-serif", 'font-weight': 700, 'font-size': 12 });
     txt(svg, outCx, L.outBottom + 22, 'Output lift (units)', { 'text-anchor': 'middle', fill: '#5a5a5a', 'font-family': "'Outfit',sans-serif", 'font-weight': 600, 'font-size': 13 });
 
     // focus ring (hidden until the handle is focused)
