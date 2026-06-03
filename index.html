@@ -1020,7 +1020,7 @@
       var svgX = (clientX - r.left) / r.width * 620;
       var t = travels();
       if (!t.inPx) return animP;
-      return (svgX - G.sealX0) / t.inPx;
+      return (svgX - LAY.sealX0) / t.inPx;
     }
     anim.hit.addEventListener('pointerdown', function (e) {
       dragging = true;
